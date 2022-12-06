@@ -1,10 +1,7 @@
 # Airflow dbt Blog
 
-## About
-
 This repo is currently under review to be made public alongside an upcoming blog post for using dbt in Airflow. Once 
 blog is published, it will be linked in this `README`.
-
 
 ## Contents
 
