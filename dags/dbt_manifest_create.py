@@ -1,6 +1,6 @@
 """
-### dbt_manifest_create
-This DAG can be triggered as needed to re-create the manifest.json for the dbt models running in this environment
+### dbt Manifest Create DAG
+This DAG can be triggered as needed to re-create the manifest.json for the dbt projects embedded in this environment
 
 ### Notes
 This DAG uses the `dbt ls` command to generate a manifest.json file to be parsed. You can read more about the dbt

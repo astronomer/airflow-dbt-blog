@@ -1,5 +1,9 @@
 """
->Insert description here.
+## Load DAG B
+
+This DAG is used to illustrate setting a downstream dependency from the dbt DAGs. Notice the `schedule` parameter on the
+DAG object is referring to a [Dataset](https://airflow.apache.org/docs/apache-airflow/stable/concepts/datasets.html)
+that was generated from the dbt parsing utility in `/include/utils/dbt_dag_parser.py`
 
 """
 

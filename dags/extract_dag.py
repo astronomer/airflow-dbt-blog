@@ -1,5 +1,10 @@
 """
->Insert description here.
+## Extract DAG
+
+This DAG is used to illustrate setting an upstream dependency from the dbt DAGs. Notice the `outlets` parameter on the
+`EmptyOperator` object is creating a
+[Dataset](https://airflow.apache.org/docs/apache-airflow/stable/concepts/datasets.html) that is used in the `schedule`
+parameter of the dbt DAGs (`attribution-playbook`, `jaffle_shop`, `mrr-playbook`).
 
 """
 
