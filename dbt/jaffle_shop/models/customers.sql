@@ -50,7 +50,6 @@ with
   final as (
 
     select
-      1 as non_empty_column,
       customers.customer_id,
       customers.first_name,
       customers.last_name,

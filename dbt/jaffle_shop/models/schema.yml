@@ -8,6 +8,9 @@ models:
       - name: non_empty_column
         description: This is a test column
 
+      - name: empty_column
+        description: This is a test column
+
       - name: customer_id
         description: This is a unique identifier for a customer
         tests:
