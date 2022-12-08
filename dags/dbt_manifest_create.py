@@ -6,12 +6,12 @@ This DAG can be triggered as needed to re-create the manifest.json for the dbt p
 This DAG uses the `dbt ls` command to generate a manifest.json file to be parsed. You can read more about the dbt
 command [here](https://docs.getdbt.com/reference/commands/list)
 """
+import os
 from datetime import datetime
 
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-
-DBT_PROJECT_DIR = "/usr/local/airflow/include/dbt"
+from include.utils.dbt_env import dbt_env_vars
 
 with DAG(
     dag_id="dbt_manifest_create",
@@ -25,24 +25,12 @@ with DAG(
     }
 ) as dag:
 
-    jaffle_shop_ls = BashOperator(
-        task_id="jaffle_shop_manifest",
-        bash_command=(
-            f"dbt ls --profiles-dir {DBT_PROJECT_DIR} --project-dir {DBT_PROJECT_DIR}/jaffle_shop"
-        ),
-    )
-
-    mrr_playbook_ls = BashOperator(
-        task_id="mrr_playbook_manifest",
-        bash_command=(
-            f"dbt deps --profiles-dir {DBT_PROJECT_DIR} --project-dir {DBT_PROJECT_DIR}/mrr-playbook && \
-             dbt ls --profiles-dir {DBT_PROJECT_DIR} --project-dir {DBT_PROJECT_DIR}/mrr-playbook"
+    for project in ["jaffle_shop", "mrr-playbook", "attribution-playbook"]:
+        BashOperator(
+            task_id=f"{project}_manifest",
+            bash_command=(
+                f"dbt deps --project-dir $DBT_DIR/{project} && \
+                 dbt ls --project-dir $DBT_DIR/{project}"
+            ),
+            env=dbt_env_vars
         )
-    )
-
-    attribution_playbook = BashOperator(
-        task_id="attribution_playbook_manifest",
-        bash_command=(
-            f"dbt ls --profiles-dir {DBT_PROJECT_DIR} --project-dir {DBT_PROJECT_DIR}/attribution-playbook"
-        )
-    )
