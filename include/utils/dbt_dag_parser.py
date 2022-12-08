@@ -11,9 +11,9 @@ class DbtDagParser:
     """
     A utility class that parses out a dbt project and creates the respective task groups
 
-    :param model_name: The model to parse
-    :param dbt_root_dir: The directory containing the models
-    :param dbt_profiles_dir: The directory containing the profiles.yml
+    :param dbt_project: The dbt project to parse
+    :param dbt_root_dir: The directory containing the models - if none then uses /usr/local/airflow/dbt
+    :param dbt_profiles_dir: The directory containing the profiles.yml - if none then uses /usr/local/airflow/dbt
     :param dag: The Airflow DAG
     :param dbt_global_cli_flags: Any global flags for the dbt CLI
     :param dbt_target: The dbt target profile (e.g. dev, prod)
@@ -22,15 +22,15 @@ class DbtDagParser:
 
     def __init__(
         self,
-        model_name: str,
-        dbt_root_dir="/usr/local/airflow/include/dbt",
-        dbt_profiles_dir="/usr/local/airflow/include/dbt",
+        dbt_project: str,
+        dbt_root_dir=None,
+        dbt_profiles_dir=None,
         dag=None,
         dbt_global_cli_flags=None,
         dbt_target="dev",
         env_vars: dict = None,
     ):
-        self.model_name = model_name
+        self.dbt_project = dbt_project
         self.dbt_root_dir = dbt_root_dir
         self.dbt_profiles_dir = dbt_profiles_dir
         self.dag = dag
@@ -67,11 +67,13 @@ class DbtDagParser:
             for key, value in self.env_vars.items():
                 dbt_env_vars[key] = value
 
+        dbt_root, dbt_profiles = self.get_dir_paths()
+
         dbt_task = BashOperator(
             task_id=node_name,
             bash_command=(
                 f"dbt {self.dbt_global_cli_flags} {dbt_verb} --target {self.dbt_target} --models {model_name} \
-                  --profiles-dir {self.dbt_profiles_dir} --project-dir {self.dbt_root_dir}/{self.model_name}"
+                  --profiles-dir {dbt_profiles} --project-dir {dbt_root}/{self.dbt_project}"
             ),
             env=dbt_env_vars,
             dag=self.dag,
@@ -89,7 +91,8 @@ class DbtDagParser:
         Returns: None
 
         """
-        project_dir = f"{self.dbt_root_dir}/{self.model_name}"
+        dbt_root, dbt_profiles = self.get_dir_paths()
+        project_dir = f"{dbt_root}/{self.dbt_project}"
         manifest_json = load_dbt_manifest(project_dir=project_dir)
         dbt_tasks = {}
         groups = {}
@@ -97,7 +100,7 @@ class DbtDagParser:
         # Create the tasks for each model
         for node_name in manifest_json["nodes"].keys():
             if node_name.split(".")[0] == "model":
-                with TaskGroup(group_id=node_name.replace(".", "_").replace("core", self.model_name)) as node_group:
+                with TaskGroup(group_id=node_name.replace(".", "_").replace("core", self.dbt_project)) as node_group:
                     # Make the run nodes
                     dbt_tasks[node_name] = self.make_dbt_task(node_name, "run")
                     # Make the test nodes
@@ -114,20 +117,20 @@ class DbtDagParser:
                     if upstream_node_type == "model":
                         groups[upstream_node.replace(".", "_")] >> groups[node_name.replace(".", "_")]
 
-    def get_dbt_run_group(self):
-        """
-        Getter method to retrieve the previously constructed dbt tasks.
-        Returns: An Airflow task group with dbt run nodes.
-        """
-        return self.dbt_run_group
+    def get_dir_paths(self):
+        dbt_default = os.environ.get("DBT_DIR")
+        profiles_default = os.environ.get("DBT_PROFILES_DIR")
+        if self.dbt_root_dir is None:
+            dbt_root = dbt_default
+        else:
+            dbt_root = self.dbt_root_dir
 
-    def get_dbt_test_group(self):
-        """
-        Getter method to retrieve the previously constructed dbt tasks.
-        Returns: An Airflow task group with dbt test nodes.
-        """
-        return self.dbt_test_group
+        if self.dbt_profiles_dir is None:
+            dbt_profiles = profiles_default
+        else:
+            dbt_profiles = self.dbt_profiles_dir
 
+        return dbt_root, dbt_profiles
 
 def load_dbt_manifest(project_dir):
     """
