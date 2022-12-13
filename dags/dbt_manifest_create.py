@@ -9,7 +9,7 @@ command [here](https://docs.getdbt.com/reference/commands/list)
 from datetime import datetime
 
 from airflow import DAG
-from astro_sputnik.dbt.core.operators import DBTLSOperator
+from cosmos.providers.dbt.core.operators import DBTBaseOperator
 
 with DAG(
     dag_id="dbt_manifest_create",
@@ -24,8 +24,9 @@ with DAG(
 ) as dag:
 
     for project in ["jaffle_shop", "mrr-playbook", "attribution-playbook"]:
-        DBTLSOperator(
+        DBTBaseOperator(
             task_id=f"{project}_manifest",
+            base_cmd="ls",
             schema="public",
             conn_id="airflow_db",
             project_dir=f"/usr/local/airflow/dbt/{project}"

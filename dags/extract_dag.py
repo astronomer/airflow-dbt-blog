@@ -13,8 +13,6 @@ from pendulum import datetime
 from airflow import DAG
 from airflow.datasets import Dataset
 from airflow.operators.empty import EmptyOperator
-from cosmos.providers.dbt.core.operators import MyCustomOperator
-
 
 with DAG(
     dag_id="extract_dag",
@@ -29,5 +27,4 @@ with DAG(
 
     EmptyOperator(task_id="ingestion_workflow", outlets=[Dataset("DAG://EXTRACT_DAG")])
 
-    MyCustomOperator(task_id="this_is_a_test")
 
