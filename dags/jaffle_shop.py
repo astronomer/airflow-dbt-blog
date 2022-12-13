@@ -12,7 +12,7 @@ from pendulum import datetime
 from airflow import DAG
 from airflow.datasets import Dataset
 from airflow.utils.task_group import TaskGroup
-from cosmos.providers.dbt.core.operators import DBTSeedOperator, DBTRunOperator
+from cosmos.providers.dbt.core.operators import DBTSeedOperator, DBTRunOperator, DBTTestOperator
 
 with DAG(
     dag_id="jaffle_shop",
@@ -39,6 +39,13 @@ with DAG(
         conn_id="airflow_db"
     )
 
+    test = DBTTestOperator(
+        task_id="dbt_test",
+        project_dir="/usr/local/airflow/dbt/jaffle_shop",
+        schema="public",
+        conn_id="airflow_db"
+    )
+
     # with TaskGroup(group_id="dbt") as dbt:
     #     dag_parser = DbtProjectParser(
     #         dbt_project="jaffle_shop",
@@ -46,6 +53,6 @@ with DAG(
     #         conn_id="airflow_db"
     #     )
 
-    seed >> run
+    seed >> run >> test
 
 
