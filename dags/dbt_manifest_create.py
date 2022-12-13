@@ -6,12 +6,10 @@ This DAG can be triggered as needed to re-create the manifest.json for the dbt p
 This DAG uses the `dbt ls` command to generate a manifest.json file to be parsed. You can read more about the dbt
 command [here](https://docs.getdbt.com/reference/commands/list)
 """
-import os
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-from include.utils.dbt_env import dbt_env_vars
+from astro_sputnik.dbt.core.operators import DBTLSOperator
 
 with DAG(
     dag_id="dbt_manifest_create",
@@ -26,11 +24,9 @@ with DAG(
 ) as dag:
 
     for project in ["jaffle_shop", "mrr-playbook", "attribution-playbook"]:
-        BashOperator(
+        DBTLSOperator(
             task_id=f"{project}_manifest",
-            bash_command=(
-                f"dbt deps --project-dir $DBT_DIR/{project} && \
-                 dbt ls --project-dir $DBT_DIR/{project}"
-            ),
-            env=dbt_env_vars
+            schema="public",
+            conn_id="airflow_db",
+            project_dir=f"/usr/local/airflow/dbt/{project}"
         )

@@ -1,5 +1,4 @@
 name: acme
-profile: 'my-postgres-db'
 version: '1.0'
 config-version: 2
 
