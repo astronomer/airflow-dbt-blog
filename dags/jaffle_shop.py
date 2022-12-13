@@ -12,8 +12,7 @@ from pendulum import datetime
 from airflow import DAG
 from airflow.datasets import Dataset
 from airflow.utils.task_group import TaskGroup
-from astro_sputnik.dbt.core.utils.project_parser import DbtProjectParser
-from astro_sputnik.dbt.core.operators import DBTSeedOperator
+from cosmos.providers.dbt.core.operators import DBTSeedOperator, DBTRunOperator
 
 with DAG(
     dag_id="jaffle_shop",
@@ -33,13 +32,20 @@ with DAG(
         conn_id="airflow_db",
     )
 
-    with TaskGroup(group_id="dbt") as dbt:
-        dag_parser = DbtProjectParser(
-            dbt_project="jaffle_shop",
-            schema="public",
-            conn_id="airflow_db"
-        )
+    run = DBTRunOperator(
+        task_id="dbt_run",
+        project_dir="/usr/local/airflow/dbt/jaffle_shop",
+        schema="public",
+        conn_id="airflow_db"
+    )
 
-    seed >> dbt
+    # with TaskGroup(group_id="dbt") as dbt:
+    #     dag_parser = DbtProjectParser(
+    #         dbt_project="jaffle_shop",
+    #         schema="public",
+    #         conn_id="airflow_db"
+    #     )
+
+    seed >> run
 
 
