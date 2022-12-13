@@ -10,7 +10,7 @@ airflow:
     - conn_id: airflow_db
       conn_type: postgres
       conn_host: postgres
-      conn_schema: public
+      conn_schema: postgres
       conn_login: postgres
       conn_password: postgres
       conn_port: 5432
