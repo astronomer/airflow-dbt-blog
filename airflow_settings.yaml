@@ -7,7 +7,7 @@
 
 airflow:
   connections:
-    - conn_id: postgres
+    - conn_id: airflow_db
       conn_type: postgres
       conn_host: postgres
       conn_schema: public
