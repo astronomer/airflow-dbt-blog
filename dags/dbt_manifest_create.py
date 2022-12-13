@@ -9,7 +9,7 @@ command [here](https://docs.getdbt.com/reference/commands/list)
 from datetime import datetime
 
 from airflow import DAG
-from cosmos.providers.dbt.core.operators import DBTBaseOperator
+from cosmos.providers.dbt.core.operators import DBTLSOperator
 
 with DAG(
     dag_id="dbt_manifest_create",
@@ -24,7 +24,7 @@ with DAG(
 ) as dag:
 
     for project in ["jaffle_shop", "mrr-playbook", "attribution-playbook"]:
-        DBTBaseOperator(
+        DBTLSOperator(
             task_id=f"{project}_manifest",
             base_cmd="ls",
             schema="public",
