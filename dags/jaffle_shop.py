@@ -28,22 +28,26 @@ with DAG(
     seed = DBTSeedOperator(
         task_id="dbt_seed",
         project_dir="/usr/local/airflow/dbt/jaffle_shop",
+        full_refresh=True,
         schema="public",
         conn_id="airflow_db",
+        # python_venv="/usr/local/airflow/dbt_venv/bin/activate"
     )
 
     run = DBTRunOperator(
         task_id="dbt_run",
         project_dir="/usr/local/airflow/dbt/jaffle_shop",
         schema="public",
-        conn_id="airflow_db"
+        conn_id="airflow_db",
+        # python_venv="/usr/local/airflow/dbt_venv/bin/activate"
     )
 
     test = DBTTestOperator(
         task_id="dbt_test",
         project_dir="/usr/local/airflow/dbt/jaffle_shop",
         schema="public",
-        conn_id="airflow_db"
+        conn_id="airflow_db",
+        # python_venv="/usr/local/airflow/dbt_venv/bin/activate"
     )
 
     # with TaskGroup(group_id="dbt") as dbt:

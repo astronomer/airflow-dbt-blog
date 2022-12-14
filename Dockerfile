@@ -5,8 +5,12 @@ ENV AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
 USER root
 COPY /cosmos/ /cosmos
 WORKDIR "/usr/local/airflow/cosmos"
+# RUN pip install -e . --no-dependencies #useful for testing pyenv
 RUN pip install -e .
-
-WORKDIR "/usr/local/airflow"
-
 USER astro
+
+#Install then venv /usr/local/airflow/dbt_venv/bin/activate
+#WORKDIR "/usr/local/airflow"
+#COPY dbt-requirements.txt ./
+#RUN python -m virtualenv dbt_venv && source dbt_venv/bin/activate && \
+#    pip install --no-cache-dir -r dbt-requirements.txt && deactivate
