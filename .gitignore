@@ -7,4 +7,4 @@ logs/
 astronomer-sputnik/
 venv/
 profiles.yml
-cosmos/
+astronomer-cosmos/
