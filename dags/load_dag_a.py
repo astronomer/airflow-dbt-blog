@@ -18,7 +18,7 @@ with DAG(
     dag_id="load_dag_a",
     start_date=datetime(2022, 11, 27),
     schedule=[
-        Dataset("DBT://STG_ORDERS"),
+        Dataset("DBT://ORDERS"),
         Dataset("DBT://CUSTOMER_CHURN_MONTH")
     ],
     doc_md=__doc__,
