@@ -5,7 +5,6 @@ ENV AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
 USER root
 COPY /astronomer-cosmos/ /astronomer-cosmos
 WORKDIR "/usr/local/airflow/astronomer-cosmos"
-# RUN pip install -e . --no-dependencies # useful for testing pyenv
 RUN pip install -e .
 USER astro
 

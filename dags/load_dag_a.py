@@ -18,8 +18,8 @@ with DAG(
     dag_id="load_dag_a",
     start_date=datetime(2022, 11, 27),
     schedule=[
-        Dataset("DBT://ORDERS"),
-        Dataset("DBT://CUSTOMER_CHURN_MONTH")
+        Dataset("DBT://AIRFLOW_DB/JAFFLE_SHOP/ORDERS"),
+        Dataset("DBT://AIRFLOW_DB/MRR-PLAYBOOK/CUSTOMER_CHURN_MONTH")
     ],
     doc_md=__doc__,
     catchup=False,

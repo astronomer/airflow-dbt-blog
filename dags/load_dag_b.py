@@ -17,7 +17,7 @@ from airflow.operators.empty import EmptyOperator
 with DAG(
     dag_id="load_dag_b",
     start_date=datetime(2022, 11, 27),
-    schedule=[Dataset("DBT://ATTRIBUTION_TOUCHES")],
+    schedule=[Dataset("DBT://AIRFLOW_DB/ATTRIBUTION-PLAYBOOK/ATTRIBUTION_TOUCHES")],
     doc_md=__doc__,
     catchup=False,
     default_args={
