@@ -12,9 +12,8 @@ from pendulum import datetime
 
 from airflow import DAG
 from airflow.datasets import Dataset
-from airflow.utils.task_group import TaskGroup
-from cosmos.providers.dbt.core.operators import DBTSeedOperator, DBTRunOperator, DBTTestOperator
-
+from cosmos.providers.dbt.core.operators import DBTSeedOperator
+from cosmos.providers.dbt.task_group import DbtTaskGroup
 
 with DAG(
     dag_id="attribution-playbook",
@@ -35,25 +34,13 @@ with DAG(
         conn_id="airflow_db"
     )
 
-    run = DBTRunOperator(
-        task_id="dbt_run",
-        project_dir="/usr/local/airflow/dbt/attribution-playbook",
-        schema="public",
-        conn_id="airflow_db"
+    attr_playbook = DbtTaskGroup(
+        dbt_project_name="attribution-playbook",
+        conn_id="airflow_db",
+        dbt_args={
+            "schema": "public"
+        },
+        dag=dag
     )
 
-    test = DBTTestOperator(
-        task_id="dbt_test",
-        project_dir="/usr/local/airflow/dbt/attribution-playbook",
-        schema="public",
-        conn_id="airflow_db"
-    )
-
-    # with TaskGroup(group_id="dbt") as dbt:
-    #     dag_parser = DbtProjectParser(
-    #         dbt_project="attribution-playbook",
-    #         schema="public",
-    #         conn_id="airflow_db"
-    #     )
-
-    seed >> run >> test
+    seed >> attr_playbook

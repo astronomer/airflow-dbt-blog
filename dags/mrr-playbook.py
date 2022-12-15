@@ -12,8 +12,8 @@ from pendulum import datetime
 
 from airflow import DAG
 from airflow.datasets import Dataset
-from airflow.utils.task_group import TaskGroup
-from cosmos.providers.dbt.core.operators import DBTSeedOperator, DBTRunOperator, DBTTestOperator
+from cosmos.providers.dbt.core.operators import DBTSeedOperator
+from cosmos.providers.dbt.task_group import DbtTaskGroup
 
 
 with DAG(
@@ -32,29 +32,19 @@ with DAG(
         task_id="dbt_seed",
         project_dir="/usr/local/airflow/dbt/mrr-playbook",
         schema="public",
-        conn_id="airflow_db"
+        conn_id="airflow_db",
+        python_venv="/usr/local/airflow/dbt_venv/bin/activate"
     )
 
-    run = DBTRunOperator(
-        task_id="dbt_run",
-        project_dir="/usr/local/airflow/dbt/mrr-playbook",
-        schema="public",
-        conn_id="airflow_db"
+    mrr_playbook = DbtTaskGroup(
+        dbt_project_name="mrr-playbook",
+        conn_id="airflow_db",
+        dbt_args={
+            "schema": "public",
+            "python_venv": "/usr/local/airflow/dbt_venv/bin/activate"
+        },
+        dag=dag,
     )
 
-    test = DBTTestOperator(
-        task_id="dbt_test",
-        project_dir="/usr/local/airflow/dbt/mrr-playbook",
-        schema="public",
-        conn_id="airflow_db"
-    )
-
-    # with TaskGroup(group_id="dbt") as dbt:
-    #     dag_parser = DbtProjectParser(
-    #         dbt_project="mrr-playbook",
-    #         schema="public",
-    #         conn_id="airflow_db"
-    #     )
-
-    seed >> run >> test
+    seed >> mrr_playbook
 
