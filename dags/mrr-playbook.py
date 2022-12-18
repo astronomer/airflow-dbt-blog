@@ -17,6 +17,7 @@ mrr_playbook = DbtDag(
     conn_id="airflow_db",
     dbt_args={
         "schema": "public",
+        "python_venv": "/usr/local/airflow/dbt_venv/bin/activate"
     },
     dag_id="mrr_playbook",
     start_date=datetime(2022, 11, 27),
